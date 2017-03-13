@@ -16,7 +16,8 @@ nelrts:
 	mov	[len], rcx	;update len with whatever is in RCX
 	mov	rcx, [i]	;update RCX with value of *i
 loop:
-	mov	r8, [len]	;stick updated len value into R8
+	xor	r8, r8		;NOTE: this breaks on second iteration every time
+	mov	r8, [len]	;
 	cmp	rcx, r8		;we're done if counter equals str len
 	je	endloop		;
 	mov	rdi, [str + rcx];get a single char from str
