@@ -35,7 +35,8 @@ endloop:
 	leave			;
 	ret			;
 	section	.data
-str:	db "Hey!", 0xA, 0
+str:	db "Hey! This works for verry long strings up to 256 chars...", 0xA, 0
 len:	db 0
+bar:	times 15 db 0		; comment me for fun times...
 foo:	db "123456", 0xA, 0
 i:	dq 0

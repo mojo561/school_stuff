@@ -35,6 +35,7 @@ endloop:
 	leave			;
 	ret			;
 	section	.data
-str:	db "Hey! This works for verry long strings up to 256 chars...", 0xA, 0
 len:	db 0
+foo:	times 15 db 0 ; padding...
+str:	db "Hey! This works for verry long strings up to 256 chars...", 0xA, 0
 i:	dq 0
