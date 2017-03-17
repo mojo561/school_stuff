@@ -16,8 +16,8 @@ nelrts:
 	mov	[len], rcx	;update len with whatever is in RCX
 	mov	rcx, [i]	;update RCX with value of *i
 loop:
-	xor	r8, r8
-	mov	r8b, [len]
+	xor	r8, r8		;zero out r8
+	mov	r8b, [len]	;store len in lowest 8 bits of r8
 	cmp	rcx, r8		;we're done if counter equals str len
 	je	endloop		;
 	mov	rdi, [str + rcx];get a single char from str
