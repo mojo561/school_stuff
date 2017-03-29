@@ -42,7 +42,7 @@ getfrq:
 	cmp	rcx, [strlen]
 	je	qrfteg
 	xor	rdx, rdx	;
-	xor	rax, rax	;clear these out (required before every div instruction)
+	xor	rax, rax	;clear these out (rdx must be zerod out before every div instruction)
 	xor	rbx, rbx	;
 	mov	rdi, frqarr
 	mov	al, byte [buffer + rcx]
