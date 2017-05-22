@@ -1,3 +1,9 @@
+/*
+Version 2 of Ulam spiral exercise (slightly easier to read)
+
+NOTE: this version appears to consume more memory... maxPrime * 8 bytes more to be exact
+Due to how numMatrix is now defined as a pointer to an array of size_t pointers
+*/
 #include <iostream>
 #include <iomanip>
 #include <memory>
@@ -12,7 +18,6 @@ int main()
 	std::unique_ptr<size_t []> sieve = nullptr;
 	std::cout << "Enter a number: ";
 	std::cin >> len;
-	//7069 (prime) squared is as close as we can get to 50000000 (see memory limitations notes below)
 	if(len > 7069)
 	{	std::cerr << "Please enter a non-zero value <= 7069" << std::endl;
 		return -1;
@@ -37,9 +42,12 @@ int main()
 	//the release call
 	delete[] sieve.release();
 
-	size_t *numMatrix = new size_t[dmaxPrime];
-	for(size_t i = 0; i < (dmaxPrime); ++i)
-		numMatrix[i] = 0;
+	size_t **numMatrix = new size_t*[maxPrime];
+	for(size_t i = 0; i < (maxPrime); ++i)
+	{	numMatrix[i] = new size_t[maxPrime];
+		for(size_t j = 0; j < maxPrime; ++j)
+			numMatrix[i][j] = 0;
+	}
 
 	sieve = eratos(dmaxPrime);
 
@@ -50,24 +58,22 @@ int main()
 	//magic for-loop...
 	for(size_t i = 0; index >= 0 && index < dmaxPrime; ++i)
 	{	for(r = maxPrime - (i+1); r > i && index >= 0 && index < dmaxPrime; --r, --index)
-			*(numMatrix + ((maxPrime * r) + i)) = sieve[index];
+			numMatrix[r][i] = sieve[index];
 
 		for(c = i; c < (maxPrime - (i+1)) && index >= 0 && index < dmaxPrime; ++c, --index)
-			*(numMatrix + ((maxPrime * r) + c)) = sieve[index];
+			numMatrix[r][c] = sieve[index];
 
 		for(r = i; r < (maxPrime - (i+1)) && index >= 0 && index < dmaxPrime; ++r, --index)
-			*(numMatrix + ((maxPrime * r) + c)) = sieve[index];
+			numMatrix[r][c] = sieve[index];
 
 		for(c = maxPrime - (i+1); c > i && index >= 0 && index < dmaxPrime; --c, --index)
-			*(numMatrix + ((maxPrime * r) + c)) = sieve[index];
+			numMatrix[r][c] = sieve[index];
 
 		if(index == 0)
-		{	size_t *nextA = (numMatrix + ((maxPrime * (r - 1)) + (c + 1)));
-			size_t *nextB = (numMatrix + ((maxPrime * (r + 1)) + (c + 1)));
-			if(*nextA == 0)
-				*nextA = sieve[index];
-			else if(*nextB == 0)
-				*nextB = sieve[index];
+		{	if(numMatrix[r - 1][c + 1] == 0)
+				numMatrix[r - 1][c + 1] = sieve[index];
+			else if(numMatrix[r + 1][c + 1] == 0)
+				numMatrix[r + 1][c + 1] = sieve[index];
 			break;
 		}
 	}
@@ -80,7 +86,7 @@ int main()
 
 	for(size_t i = 0; i < maxPrime; ++i)
 	{	for(size_t j = 0; j < maxPrime; ++j)
-		{	uint32_t next = *(numMatrix + ((maxPrime*i) + j));
+		{	size_t next = numMatrix[i][j];
 			if(next != 0)
 				std::cout << std::setw(width) << next;
 			else
@@ -88,25 +94,14 @@ int main()
 		}
 		std::cout << "\n";
 	}
+
+	for(size_t i = 0; i < maxPrime; ++i)
+		delete[] numMatrix[i];
 	delete[] numMatrix;
 }
 
 std::unique_ptr<size_t[]> eratos(uint32_t n)
 {
-	//memory limits: this virtual machine has 1024MB of RAM
-	//(1024000000 bytes), allocating an array of n = (2^16)-1 already consumes
-	//a significant portion of available memory ((2^16-1) * 8 = 524280 bytes)
-	//Largest value we /could/ use is around 128000000 (assuming swap file is
-	//also large enough?)
-	//let's be nice to this VM and leave some space for other programs...
-	//(128000000 - 50000000 should leave 78MB free)
-	//another consideration: largest value to compute under this limit is
-	//50000000^2 (2500000000000000), size_t can definitely store this, however
-	//increasing the max value for n may introduce calculation errors due to
-	//overflow... perhaps the ceiling is (18446744073709551616 / 2) - 1?
-	// (9223372036854775807, assuming size_t = 64bits, then again you would
-	//also need A LOT of RAM as well...)
-	//largest prime number found under the current limit should be 49999991
 	if(n > 50000000)
 		return nullptr;
 	else if(n == 0)
