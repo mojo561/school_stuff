@@ -21,8 +21,7 @@ int main()
 		//the address of fizzbuzz to the result. This essentially resolves to
 		//a pointer (to a 'string') at a particular index in fizzbuzz, since fizzbuzz is an array
 		//of char pointers
-		//printf((!(i%3)+!(i%5)*2)[fizzbuzz], i);
-		printf(fizzbuzz[(!(i%3)+!(i%5)*2)], i);
+		printf((!(i%3)+!(i%5)*2)[fizzbuzz], i);
 
 	return 0;
 }
